@@ -1,0 +1,143 @@
+﻿@model ProductDetailsViewModel
+@using Ganss.Xss
+@{
+    var sanitizer = new HtmlSanitizer();
+    sanitizer.AllowedTags.Add("br");
+    ViewBag.Title = @Model.Category;
+}
+<link href="~/css/productDetails.css" rel="stylesheet" />
+
+
+<div class="container" style="display: flex;">
+    <nav>
+        @await Component.InvokeAsync("FlexMenu")
+    </nav>
+    <div class="content">
+        <div style="width: 100%;">
+            <div class="product">
+
+                <div class="product-image">
+                    <div class="inline-image">
+                        <img class="inline-image-block" src="https://zovprofil.by/Images/ClientsCatalogImages/Thumbs/@Model.FileName" alt="Product Image" onclick="openModal('https://zovprofil.by/Images/ClientsCatalogImages/@Model.FileName')">
+                        @if (Model.techStoreFileName != null)
+                        {
+                            <img class="inline-image-block" src="https://zovprofil.by/Images/TechStore/@Model.techStoreFileName" alt="Product Image" onclick="openModal('https://zovprofil.by/Images/TechStore/@Model.techStoreFileName')">
+                        }
+                    </div>
+
+                    <div class="swiper swiper-main swiper-flag" rewind="true">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <img src="https://zovprofil.by/Images/ClientsCatalogImages/Thumbs/@Model.FileName" alt="Product Image" onclick="openModal('https://zovprofil.by/Images/ClientsCatalogImages/@Model.FileName')">
+                            </div>
+                            @if (Model.techStoreFileName != null)
+                            {
+                                <div class="swiper-slide">
+                                    <img src="https://zovprofil.by/Images/TechStore/@Model.techStoreFileName" alt="Product Image" onclick="openModal('https://zovprofil.by/Images/TechStore/@Model.techStoreFileName')">
+                                </div>
+                            }
+                        </div>
+                        <div class="swiper-scrollbar"></div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <p><strong>@Html.Raw(sanitizer.Sanitize(@Model.Name))<br />@Html.Raw(sanitizer.Sanitize(@Model.Color))</strong></p>
+                    <div class="info product-description">
+                        <p><strong>Описание:</strong></p>
+                        <p>@Html.Raw(sanitizer.Sanitize(@Model.Description))</p>
+                    </div>
+                    <div class="info product-sizes">
+                        <p><strong>Размеры:</strong></p>
+                        <p>@Html.Raw(sanitizer.Sanitize(@Model.Sizes))</p>
+                    </div>
+                    <div class="info product-material">
+                        <p><strong>Материалы:</strong></p>
+                        <p>@Html.Raw(sanitizer.Sanitize(@Model.Material))</p>
+                    </div>
+                    @if(Model.CategoryColors != null)
+                    {
+                        <div class="info product-colors">
+                            <p><strong>Цвета:</strong></p>
+                            <div class ="product-color-links">
+                                @foreach (var color in Model.CategoryColors)
+                                {
+                                    <a asp-action="ProductDetails" asp-route-imageId=@color.ImageId title="@color.Color">
+                                        <div class="product-color-img" style="background-image: url('https://zovprofil.by/Images/ClientsCatalogImages/Thumbs/@color.FileName');"></div>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if(Model.ProductType == 0)
+            {
+                <div id="relatedFronts" style="margin-top: 50px;">
+                    @await Component.InvokeAsync("RelatedFronts", new { matrixId = Model.MatrixId, name = Model.Name })
+                </div>
+
+                <div id="relatedDecors" style="margin-top: 50px;">
+                    @await Component.InvokeAsync("RelatedDecors", new { matrixId = Model.MatrixId })
+                </div>
+            }
+        </div>
+        <div class="promotion">
+            @await Component.InvokeAsync("PromotionalBlock")
+        </div>
+    </div>
+
+
+
+    <div class="modal" id="imageModal">
+        <span class="close" id="closeModal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+
+
+</div>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function setMaxHeightInContainer(containerSelector) {
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            const blocks = container.querySelectorAll('.block');
+            let maxHeight = 0;
+
+            blocks.forEach(function (block) {
+                const blockHeight = block.offsetHeight;
+                console.log(blockHeight, maxHeight);
+                if (blockHeight > maxHeight) {
+                    maxHeight = blockHeight;
+                }
+            });
+
+            blocks.forEach(function (block) {
+                block.style.height = maxHeight + 'px';
+            });
+        }
+
+        window.openModal = function(imageSrc) {
+            var modal = document.getElementById("imageModal");
+            var modalImg = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImg.src = encodeURI(imageSrc);
+        };
+
+        document.getElementById("closeModal").onclick = function() {
+            document.getElementById("imageModal").style.display = "none";
+        };
+
+        document.getElementById("imageModal").onclick = function(event) {
+            if (event.target === this) {
+                this.style.display = "none";
+            }
+        };
+
+        setMaxHeightInContainer('#relatedFronts');
+        setMaxHeightInContainer('#relatedDecors');
+    });
+</script>

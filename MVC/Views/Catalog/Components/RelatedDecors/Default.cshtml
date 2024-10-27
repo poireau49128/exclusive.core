@@ -1,0 +1,21 @@
+﻿@model List<ProductDetailsViewModel>
+<link rel="stylesheet" href="~/css/production.css" />
+
+@using Ganss.Xss
+@{
+    var sanitizer = new HtmlSanitizer();
+    sanitizer.AllowedTags.Add("br");
+}
+
+<h3 class="relatedProducts">Декоративные элементы:</h3>
+<div class="relatedProducts">
+    @foreach (ProductDetailsViewModel product in Model)
+    {
+        <a asp-action="ProductDetails" asp-route-imageId=@product.ImageId class="block">
+            <div class="block-img">
+                <img src="https://zovprofil.by/Images/ClientsCatalogImages/Thumbs//@product.FileName" alt="">
+            </div>
+            <p>@Html.Raw(sanitizer.Sanitize(product.Name))<br />@product.Color</p>
+        </a>
+    }
+</div>

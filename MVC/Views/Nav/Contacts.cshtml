@@ -1,0 +1,50 @@
+﻿<link href="/css/contacts.css" rel="stylesheet" />
+@model IEnumerable<MVC.Models.Section>
+@functions {
+    // Вспомогательный метод для отображения строки только если значение не null или пусто
+    private string DisplayIfNotNullOrEmpty(string? value, string label=null)
+    {
+        return !string.IsNullOrEmpty(value) ? $"{label}{value}" : string.Empty;
+    }
+}
+@{
+    ViewBag.Title = "Контакты";
+}
+
+<div class="container">
+    @foreach (var sect in Model)
+    {
+        <div class="block">
+            <div class="header">
+                <div class="header-left">
+                    <span>@sect.Name</span>
+                </div>
+                <div class="header-right">
+                    @if (!string.IsNullOrEmpty(sect.Email))
+                    {
+                        <span>e-mail: <a href="mailto:@sect.Email" style="font-size:15px; color:white; text-decoration:underline">@sect.Email</a></span>
+                    }
+                    <span>@DisplayIfNotNullOrEmpty(sect.Fax, "тел/факс: ")</span>
+                    <span>@DisplayIfNotNullOrEmpty(sect.Phone, "тел.: ")</span>
+                </div>
+            </div>
+
+            <div class="contacts">
+                @foreach (var contact in sect.Contacts)
+                {
+                    <div class="contact-item">
+                        @{
+                            var avatar = contact.isMale ? "/img/img_avatar.png" : "/img/img_avatar2.png";
+                        }
+                        <img src="@avatar" alt="Alternate Text" class="contact-avatar" />
+                        <span class="contact-name">@DisplayIfNotNullOrEmpty(contact.Name)</span>
+                        <span class="contact-post">@DisplayIfNotNullOrEmpty(contact.Position)</span>
+                        <span class="contact-lang">@DisplayIfNotNullOrEmpty(contact.Languages)</span>
+                        <span class="contact-phone">@DisplayIfNotNullOrEmpty(contact.Phone, "моб. ")</span>
+                        <span class="contact-info">@DisplayIfNotNullOrEmpty(contact.Description)</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

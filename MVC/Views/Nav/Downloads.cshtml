@@ -1,0 +1,90 @@
+﻿@model IEnumerable<MVC.Models.Document>
+<link href="~/css/downloads.css" rel="stylesheet" />
+@{
+    var fileIcons = ViewBag.FileIcons as Dictionary<string, string>;
+    ViewBag.Title = "Документы";
+}
+
+
+<div class="container">
+    <div class="text">
+        Мы рады предоставить своим клиентам всю необходимую информацию по нашей продукции.
+        В разделах «Каталоги» и «Презентации» Вы найдете актуальные материалы по мебельным фасадам и погонажному профилю.
+        Памятки и информацию о скидках содержит раздел «Информация».
+        Для изучения типовых договоров и схем сборки мебели посетите раздел «Документы».
+        Дизайнерам и проектировщикам предлагаем скачать прорисованные в программах 3ds Max и PRO100
+        элементы мебели и стеновых панелей в подразделе «Библиотека для 3D-проектирования».<br /><br />
+        Мы всегда стремимся к взаимовыгодному сотрудничеству с новыми оптовыми и розничными клиентами,
+        а также индивидуальными предпринимателями.
+        Воспользуйтесь разделами «Информация» и «Презентации»,
+        чтобы узнать об условиях сотрудничества, географии поставок и ценовой программе.
+    </div>
+
+    <div class="category-wrapper">
+        @foreach (var category in Model.Select(d => d.Category).Distinct())
+        {
+            <div id="@category" class="men-item" onclick="SelectItem(this)">
+                @category
+                <div class="image-container">
+                    <img src="~/img/right.png" style="padding-top:9px; padding-right:15px;" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="files-wrapper">
+        @foreach (var category in Model.Select(d => d.Category).Distinct())
+        {
+            <div id="@(category + "Cont")" style="display:none">
+                @foreach (var doc in Model.Where(d => d.Category == category))
+                {
+                    <div class="downitem">
+                        @{
+                            string iconPath = fileIcons.ContainsKey(doc.FileType) ? fileIcons[doc.FileType] : "/img/default.png";
+                        }
+                        <img src="@iconPath" class="file-ic" />
+                        <div class="data">
+                            <span class="name">@doc.Name</span>
+                            <span class="desc">@doc.Description</span>
+                        </div>
+                        <a target="_blank" href="https://zovprofil.by/Files/@doc.FileName">
+                            <div class="down-but">
+                                <img src="~/img/download.png" class="download" />
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div style="text-align:center">
+    <div style="width:70%; display:inline-block">
+
+        <div class="men-cont">
+        </div>
+        <div class="down-cont">
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var firstCategory = $(".men-item").first();
+        if (firstCategory.length) {
+            SelectItem(firstCategory[0]);
+        }
+    });
+
+    function SelectItem(e) {
+        $('.men-item-sel').each(function () {
+            document.getElementById(this.id).className = "men-item";
+            document.getElementById(this.id + "Cont").style.display = "none";
+        });
+
+        document.getElementById(e.id).className = "men-item-sel";
+        document.getElementById(e.id + "Cont").style.display = "inline-block";
+    }
+</script>
